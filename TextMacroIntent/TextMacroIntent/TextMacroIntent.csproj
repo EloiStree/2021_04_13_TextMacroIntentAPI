@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>C:\Users\OpenMacroInput\Desktop\Workshop_OpenMacroInput\OpenMacroInput_Package\OpenMacroInputPackages\Assets\2021_04_11_TextMacroIntent\Runtime\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Core\Time\RICOCHET\" />
+  </ItemGroup>
+
+</Project>
