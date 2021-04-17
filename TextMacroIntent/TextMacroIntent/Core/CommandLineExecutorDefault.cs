@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TextMacroIntent.Core
+namespace TextMacroIntent
 {
-    public class CommandLineExecutorDefault : I_CommandLineExecutorFrequently
+    public class CommandLineExecutorDefault : I_CommandLineDirectExecutor, I_CommandLineDirectExecutorWithReturn
     {
         I_CommandAuctionDistributor m_auction;
 
@@ -12,17 +12,31 @@ namespace TextMacroIntent.Core
         {
             m_auction = auction;
         }
-        public void Execute(I_CommandLine commandLine )
+        public void Execute(I_CommandLine commandLine)
         {
             bool found;
             I_Interpreter inter;
             m_auction.SeekForFirstTaker(commandLine, out found, out inter);
-            if (found && inter!=null ) {
-                I_ExecutionStatus status=null;
-                inter.TranslateToActionsWithStatus(ref commandLine,ref status);
+            if (found && inter != null)
+            {
+                I_ParsingStatus status = null;
+                inter.TranslateToActionsWithStatus(ref commandLine, ref status);
             }
         }
 
+        public void Execute(I_CommandLine commandLine, out I_ParsingStatus parseStatus)
+        {
+            parseStatus = new ParsingExecutionStatus();
+            bool found;
+            I_Interpreter inter;
+            m_auction.SeekForFirstTaker(commandLine, out found, out inter);
+            if (found && inter != null)
+            {
+                parseStatus = new ParsingExecutionStatus();
+                inter.TranslateToActionsWithStatus(ref commandLine, ref parseStatus);
+            }
+            else parseStatus.SetAsFail("Did not found the interpreter");
+        }
 
 
 
@@ -41,7 +55,7 @@ namespace TextMacroIntent.Core
             Execute(list);
         }
 
-
+       
         public void Execute(IEnumerable<I_CommandLine> commandLines)
         {
             foreach (I_CommandLine c in commandLines)
@@ -53,37 +67,45 @@ namespace TextMacroIntent.Core
             Execute(commandLines.GetLines());
         }
 
-        #region COMPILE PART
-        public void Compile(string command)
+        public void Execute(string commandLine, out I_ParsingStatus exeStatus)
         {
-            throw new NotImplementedException();
+            Execute(new CommandLine(commandLine), out exeStatus);
         }
 
-        public void Compile(I_CommandLine command)
+        public void Execute(string[] commandLine, out I_ParsingStatus exeStatus)
         {
-            throw new NotImplementedException();
+            List<I_CommandLine> cmds = new List<I_CommandLine>();
+            for (int i = 0; i < commandLine.Length; i++)
+            {
+                cmds.Add(new CommandLine(commandLine[i]));
+            }
+            Execute(cmds, out exeStatus);
         }
 
-        public void Compile(I_CommandLineEnumList commandLines)
+       
+
+        public void Execute(IEnumerable<I_CommandLine> commandLines, out I_ParsingStatus exeStatus)
         {
-            throw new NotImplementedException();
+            I_ParsingStatus groupStatus = new ParsingExecutionStatus();
+            exeStatus = groupStatus;
+            I_ParsingStatus itemStatus = new ParsingExecutionStatus();
+            foreach (I_CommandLine cmd in commandLines)
+            {
+                Execute(cmd, out itemStatus);
+                if (itemStatus.HadError()) {
+                    groupStatus.SetAsFail(itemStatus.GetErrorInformation());
+                    return;
+                }
+            }
+
+            groupStatus.SetAsFinish(true);
         }
 
-        public void Compile(string command, out I_InterpretorCompiledAction compilationRegistered)
+        public void Execute(I_CommandLineEnumList commandLines, out I_ParsingStatus exeStatus)
         {
-            throw new NotImplementedException();
+            Execute(commandLines.GetLines(), out exeStatus);
         }
 
-        public void Compile(I_CommandLine command, out I_InterpretorCompiledAction compilationRegistered)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Compile(I_CommandLineEnumList commandLines, out I_InterpretorCompiledAction compilationRegistered)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
-
+      
     }
 }

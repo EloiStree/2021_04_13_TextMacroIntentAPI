@@ -2,10 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>C:\Users\OpenMacroInput\Desktop\Workshop_OpenMacroInput\OpenMacroInput_Package\OpenMacroInputPackages\Assets\2021_04_11_TextMacroIntent\Runtime\</OutputPath>
+    <OutputPath>C:\Users\OpenMacroInput\Desktop\Workshop_OpenMacroInput\OpenMacroInput_Package\OpenMacroInputPackages\Assets\2021_04_11_TextMacroIntent\Runtime\d\</OutputPath>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin\Debug\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

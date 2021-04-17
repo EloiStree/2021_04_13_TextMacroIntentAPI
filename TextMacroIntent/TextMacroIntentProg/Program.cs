@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Threading;
 using TextMacroIntent;
-using TextMacroIntent.Core.Time.LOOPER;
-using TextMacroIntent.DefaultInterpretor.Time;
-using TextMacroIntent.Unstore;
 
 namespace TextMacroIntentProg
 {

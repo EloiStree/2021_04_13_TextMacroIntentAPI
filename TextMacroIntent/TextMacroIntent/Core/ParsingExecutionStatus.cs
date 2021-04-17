@@ -4,26 +4,33 @@ using System.Text;
 
 namespace TextMacroIntent
 {
-    public class CmdExecutionStatus : I_ExecutionStatus
+    public class ParsingExecutionStatus : I_ParsingStatus
     {
-        public bool m_finishExecuting;
-        public bool m_succedToExecute ;
+        public bool m_finishParsing;
+        public bool m_succedToParse ;
         public string m_errorInformation ;
 
-      
 
-        public CmdExecutionStatus()
+
+        public ParsingExecutionStatus()
         {
-            m_finishExecuting = false;
-            m_succedToExecute = false;
+            m_finishParsing = false;
+            m_succedToParse = false;
             m_errorInformation = null;
+        }
+        public ParsingExecutionStatus(string failMessage)
+        {
+            m_finishParsing = false;
+            m_succedToParse = false;
+            m_errorInformation = null;
+            SetAsFail(failMessage);
         }
 
         public void Reset()
         {
-            m_succedToExecute = false;
+            m_succedToParse = false;
             m_errorInformation = null;
-            m_finishExecuting = false;
+            m_finishParsing = false;
         }
         public string GetErrorInformation()
         {
@@ -37,17 +44,17 @@ namespace TextMacroIntent
 
         public bool HasFinish()
         {
-            return m_finishExecuting;
+            return m_finishParsing;
         }
 
         public bool HasSucced()
         {
-            return m_succedToExecute;
+            return m_succedToParse;
         }
 
         public void SetAsSucced()
         {
-            m_finishExecuting = true; m_succedToExecute = true;
+            m_finishParsing = true; m_succedToParse = true;
         }
 
         public void SetAsFail(string errorDescription = "")
@@ -58,7 +65,7 @@ namespace TextMacroIntent
 
         public void SetAsFinish(bool succed)
         {
-            m_finishExecuting = true; m_succedToExecute = succed;
+            m_finishParsing = true; m_succedToParse = succed;
         }
     }
 }

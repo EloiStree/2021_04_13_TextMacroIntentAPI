@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TextMacroIntent
 {
-    public class CommandRelayByTimeSubstraction
+    public class CommandRelayByTimeSubstraction: I_ThreadDependant
     {
          I_CommandLineRelay m_relayListening;
          InCountCollection<I_CommandLine> m_commandInHold = new InCountCollection<I_CommandLine>();
@@ -61,5 +61,9 @@ namespace TextMacroIntent
             m_commandInHold.Add(milliseconds, command);
         }
 
+        public void ToIncludeInLoopThreadToWork()
+        {
+            CheckHolderThatAreFinishSinceLastTime();
+        }
     }
 }

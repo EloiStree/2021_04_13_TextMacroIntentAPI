@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TextMacroIntent
 {
-    public class CommandRelayAtTime
+    public class CommandRelayAtTime : I_ThreadDependant
     {
          I_CommandLineRelay m_relay;
          CommandLineAtTimeCollection<I_CommandLine> m_waitingCollection = new CommandLineAtTimeCollection<I_CommandLine>();
@@ -54,6 +54,11 @@ namespace TextMacroIntent
         public void PushIn(I_BlackBoxTime lune, string cmd)
         {
             PushIn(lune.GetTime(), new CommandLine(cmd));
+        }
+
+        public void ToIncludeInLoopThreadToWork()
+        {
+            CheckHolderThatAreFinishSinceLastTime();
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -34,9 +35,44 @@ namespace TextMacroIntent
             return text;
         }
 
+        //WARNING COPY FROM WEB
+        public static string[] Split(string source, string delim)
+        {
+            return SplitEnum(source, delim).ToArray();
+        }
+
+        public static IEnumerable<string> SplitEnum(string source, string delim)
+            {
+                // argument null checking etc omitted for brevity
+
+                int oldIndex = 0, newIndex;
+                while ((newIndex = source.IndexOf(delim, oldIndex)) != -1)
+                {
+                    yield return source.Substring(oldIndex, newIndex - oldIndex);
+                    oldIndex = newIndex + delim.Length;
+                }
+                yield return source.Substring(oldIndex);
+            }
+        
+
+
         public abstract bool CanInterpreterUnderstand(ref I_CommandLine command);
-        public abstract void TranslateToActionsWithStatus(ref I_CommandLine command, ref I_ExecutionStatus succedToExecute);
+        public abstract void TranslateToActionsWithStatus(ref I_CommandLine command, ref I_ParsingStatus succedToExecute);
 
         public abstract I_InterpretorCompiledAction TryToGetCompiledAction(I_CommandLine command)  ;
+
+        public  I_InterpretorCompiledAction TryToGetCompiledAction(I_CommandLine commandToExecute, ref I_ParsingStatus succedToExecute)
+        {
+            I_InterpretorCompiledAction action = TryToGetCompiledAction(commandToExecute);
+            if (succedToExecute != null)
+            {
+                if (action == null)
+                    succedToExecute.SetAsFail("Did not succed to translate to compiled action");
+                else succedToExecute.SetAsFinish(true);
+
+            }
+            return action;
+        }
+
     }
 }

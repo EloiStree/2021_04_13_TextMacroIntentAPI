@@ -26,11 +26,11 @@ namespace TextMacroIntent
 
         public void TryToTranslateAndExecute(I_CommandLine command)
         {
-            I_ExecutionStatus status=null;
+            I_ParsingStatus status=null;
             TryToTranslateAndExecute(command, ref status);
         }
 
-        public void TryToTranslateAndExecute(I_CommandLine command, ref I_ExecutionStatus result)
+        public void TryToTranslateAndExecute(I_CommandLine command, ref I_ParsingStatus result)
         {
             interpreter.TranslateToActionsWithStatus(ref command, ref result);
         }

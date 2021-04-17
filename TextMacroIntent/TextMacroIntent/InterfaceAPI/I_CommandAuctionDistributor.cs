@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using TextMacroIntent.Core.CommandLineType;
+using TextMacroIntent
+    
+    ;
 
 namespace TextMacroIntent
 {
@@ -17,8 +20,9 @@ namespace TextMacroIntent
     public interface I_Interpreter {
 
         bool CanInterpreterUnderstand(ref I_CommandLine command);
-        void TranslateToActionsWithStatus(ref I_CommandLine command, ref I_ExecutionStatus succedToExecute);
-        I_InterpretorCompiledAction TryToGetCompiledAction(I_CommandLine m_commandToExecute);
+        void TranslateToActionsWithStatus(ref I_CommandLine command, ref I_ParsingStatus succedToExecute);
+        I_InterpretorCompiledAction TryToGetCompiledAction(I_CommandLine commandToExecute);
+        I_InterpretorCompiledAction TryToGetCompiledAction(I_CommandLine commandToExecute, ref I_ParsingStatus succedToExecute);
     }
 
 
@@ -27,7 +31,7 @@ namespace TextMacroIntent
     {
         I_Interpreter GetInterpreter();
         void TryToTranslateAndExecute(I_CommandLine command);
-        void TryToTranslateAndExecute(I_CommandLine command, ref I_ExecutionStatus result);
+        void TryToTranslateAndExecute(I_CommandLine command, ref I_ParsingStatus result);
     }
 
     public interface I_InterpreterMetaInformation {
@@ -60,7 +64,23 @@ namespace TextMacroIntent
 
         I_CommandLine GetLinkedCommandLine();
         void Execute();
-        void Execute(ref I_ExecutionStatus status);
+        void Execute(ref I_ParsingStatus status);
+    }
+    public interface I_InterpretorEnumCompiledAccess
+    {
+
+        IEnumerable<I_CommandLine> GetLinkedCommandLines();
+        IEnumerable<I_InterpretorCompiledAccess> GetLinkedCompiledCommandLines();
+        void Execute();
+        void Execute(ref I_ParsingStatus status);
+    }
+
+    public interface I_InterpretorEnumCompiledAction
+    {
+
+        IEnumerable<I_InterpretorCompiledAction> GetLinkedCompiledCommandLines();
+        void Execute();
+        void Execute(ref I_ParsingStatus status);
     }
 
 
@@ -70,15 +90,15 @@ namespace TextMacroIntent
     public interface I_InterpretorCompiledAction
     {
         void Execute();
-        void Execute(ref I_ExecutionStatus status);
+        void Execute(ref I_ParsingStatus status);
     }
 
 
 
     public interface I_CommandLineAt
     {
-        public I_CommandLine GetCommand();
-        public I_BlackBoxTime GetWhenToExecute();
+         I_CommandLine GetCommand();
+         I_BlackBoxTime GetWhenToExecute();
     }
     /// <summary>
     /// I don't want to know what this time but give me a time proper to this program that I need to execute.
@@ -97,50 +117,44 @@ namespace TextMacroIntent
         void RemoveInterpreter(I_Interpreter interpreter);
 
     }
-    public interface I_CommandLineWaiterExecutor
-    {
 
-        public void Execute(string commandLine, out I_ExecutionStatus exeStatus);
-        public void Execute(string[] commandLine, out I_ExecutionStatus exeStatus);
-        public void Execute(I_CommandLine commandLine, out I_ExecutionStatus exeStatus);
-        public void Execute(IEnumerable<I_CommandLine> commandLines, out I_ExecutionStatus exeStatus);
-        public void Execute(I_CommandLineEnumList commandLines, out I_ExecutionStatus exeStatus);
-
+    public interface I_ThreadDependantGroup {
+        I_ThreadDependant [] GetThreadDependancies();
     }
-    public interface I_CommandLineDirectExecutor
+    public interface I_ThreadDependant
     {
-
-        public void Execute(string commandLine );
-        public void Execute(string[] commandLine);
-        public void Execute(I_CommandLine commandLine);
-        public void Execute(IEnumerable<I_CommandLine> commandLines);
-        public void Execute(I_CommandLineEnumList commandLines);
-
+        void ToIncludeInLoopThreadToWork();
     }
-    public interface I_CommandLineExecutorFrequently : I_CommandLineDirectExecutor
+    public interface I_CoroutineDependant
     {
-        public void Compile(string command);
-        public void Compile(I_CommandLine command);
-        public void Compile(I_CommandLineEnumList commandLines);
+        void ExecuteInParallel(IEnumerator toExecuteInParallel);
+    }
 
-        public void Compile(string command, out I_InterpretorCompiledAction compilationRegistered);
-        public void Compile(I_CommandLine command, out I_InterpretorCompiledAction compilationRegistered);
-        public void Compile(I_CommandLineEnumList commandLines, out I_InterpretorCompiledAction compilationRegistered);
+   
+    public interface I_CommandLineCoroutineExecutor
+    {
+        //SHOULD I CODE THIS ONE....
+         void ExecuteOnAfterAnOther(IEnumerable<I_CommandLine> commandLines, out I_ParsingStatus exeStatus);
+        
+    }
+
+    public interface I_CommandLineAuctionToExecutor : I_CommandLineDirectExecutor
+    {
+        public void AddInterpreter(I_Interpreter rubix);
+        public void RemoveInterpreter(I_Interpreter rubix);
+        public void FindInterpreter(I_CommandLine command, out bool found, out I_Interpreter interpreter);
+        public I_InterpretorCompiledAction GetCompiledAccessTo(I_CommandLine commandLine);
 
     }
 
 
     public interface I_CommandLineRelay {
 
-        public void Push(I_CommandLine commandLine);
+         void Push(I_CommandLine commandLine);
+         void Push(I_CommandLineEnumList commandLines);
     }
 
-
-
-
-
-
-    public interface I_ExecutionStatus
+    public interface I_ParsingStatus
     {
         bool HasFinish();
         bool HasSucced();
@@ -149,4 +163,65 @@ namespace TextMacroIntent
         void SetAsFinish(bool succed);
         void SetAsFail(string message = "");
     }
+
+
+    public interface I_CommandLineDirectExecutor
+    {
+
+        void Execute(string commandLine);
+        void Execute(string[] commandLine);
+        void Execute(I_CommandLine commandLine);
+        void Execute(IEnumerable<I_CommandLine> commandLines);
+        void Execute(I_CommandLineEnumList commandLines);
+
+    }
+ 
+    public interface I_CommandLineDirectExecutorWithReturn
+    {
+
+        void Execute(string commandLine, out I_ParsingStatus exeStatus);
+        void Execute(string[] commandLine, out I_ParsingStatus exeStatus);
+        void Execute(I_CommandLine commandLine, out I_ParsingStatus exeStatus);
+        void Execute(IEnumerable<I_CommandLine> commandLines, out I_ParsingStatus exeStatus);
+        void Execute(I_CommandLineEnumList commandLines, out I_ParsingStatus exeStatus);
+
+    }
+    public interface I_CommandLineDelayExecutor
+    {
+        void ExecuteAt(I_CommandLine commandLine, I_BlackBoxTime when);
+        void ExecuteAt(I_CommandLine commandLine, DateTime when);
+        void ExecuteIn(I_CommandLine commandLine, float milliseconds);
+    }
+
+    public interface I_CommandLineComplexDelayExecutor {
+
+
+        //IF IT IS RISKY TO CONSUME RESOURCE OF THE THREAD... THAT SHOULD BE MANAGE BY THE DEVELOPPER
+        //public void SetLoop(string loopName,I_CommandLine cmd, bool onState);
+        //public void RemoveLoop(string loopName);
+
+
+        public void SendRicochetNow(I_CommandLine cmd, params uint[] timeFromStartInMilliseconds);
+        public void SendRicochet(I_CommandLine cmd, DateTime timeStart, params uint[] timeFromStartInMilliseconds);
+
+    }
+
+
+
+
+
+    public interface I_CommandLineCompilated 
+    {
+
+        void Compile(string command, out I_InterpretorCompiledAction compilationRegistered);
+        void Compile(I_CommandLine command, out I_InterpretorCompiledAction compilationRegistered);
+        void Compile(string command, out I_InterpretorCompiledAccess compilationRegistered);
+        void Compile(I_CommandLine command, out I_InterpretorCompiledAccess compilationRegistered);
+       
+        void Compile(I_CommandLineEnumList commandLines, out I_InterpretorEnumCompiledAction compilationRegistered);
+        void Compile(I_CommandLineEnumList commandLines, out I_InterpretorEnumCompiledAccess compilationRegistered);
+
+    }
+
+
 }

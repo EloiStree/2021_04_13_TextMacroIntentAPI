@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TextMacroIntent
 {
-    public class CommandLineWaitingExecutorDefault : I_CommandLineWaiterExecutor
+    public class CommandLineWaitingExecutorDefault : I_CommandLineDelayExecutor, I_ThreadDependant
     {
         private I_CommandAuctionDistributor m_auctionHouse;
 
@@ -13,27 +13,37 @@ namespace TextMacroIntent
             this.m_auctionHouse = auctionHouse;
         }
 
-        public void Execute(string commandLine, out I_ExecutionStatus exeStatus)
+        public void ExecuteAt(I_CommandLine commandLine, I_BlackBoxTime when)
         {
             throw new NotImplementedException();
         }
 
-        public void Execute(string[] commandLine, out I_ExecutionStatus exeStatus)
+        public void ExecuteAt(I_CommandLine commandLine, DateTime when)
         {
             throw new NotImplementedException();
         }
 
-        public void Execute(I_CommandLine commandLine, out I_ExecutionStatus exeStatus)
+        public void ExecuteAt(I_CommandLine commandLine, out I_ParsingStatus exeStatus, I_BlackBoxTime when)
         {
             throw new NotImplementedException();
         }
 
-        public void Execute(IEnumerable<I_CommandLine> commandLines, out I_ExecutionStatus exeStatus)
+        public void ExecuteAt(I_CommandLine commandLine, out I_ParsingStatus exeStatus, DateTime when)
         {
             throw new NotImplementedException();
         }
 
-        public void Execute(I_CommandLineEnumList commandLines, out I_ExecutionStatus exeStatus)
+        public void ExecuteIn(I_CommandLine commandLine, float milliseconds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ExecuteIn(I_CommandLine commandLine, out I_ParsingStatus exeStatus, float milliseconds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ToIncludeInLoopThreadToWork()
         {
             throw new NotImplementedException();
         }

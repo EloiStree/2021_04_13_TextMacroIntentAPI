@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TextMacroIntent.Unstore
+namespace TextMacroIntent
 {
     public class DelayDateTime : I_BlackBoxTime
     {

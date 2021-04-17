@@ -22,7 +22,7 @@ namespace TextMacroIntent
             return StartWith(command.GetLine(), m_debugStartId, true, true);
         }
 
-        public override void TranslateToActionsWithStatus(ref I_CommandLine command, ref I_ExecutionStatus succedToExecute)
+        public override void TranslateToActionsWithStatus(ref I_CommandLine command, ref I_ParsingStatus succedToExecute)
         {
 
 
@@ -85,11 +85,11 @@ namespace TextMacroIntent
 
             public void Execute()
             {
-                I_ExecutionStatus s=null;
+                I_ParsingStatus s=null;
                 Execute(ref s);
             }
 
-            public void Execute(ref I_ExecutionStatus status)
+            public void Execute(ref I_ParsingStatus status)
             {
                 try
                 {

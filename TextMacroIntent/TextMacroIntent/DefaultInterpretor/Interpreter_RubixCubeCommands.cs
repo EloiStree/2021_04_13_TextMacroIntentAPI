@@ -26,10 +26,10 @@ namespace TextMacroIntent
 
 
 
-        public override void TranslateToActionsWithStatus(ref I_CommandLine command, ref I_ExecutionStatus succedToExecute)
+        public override void TranslateToActionsWithStatus(ref I_CommandLine command, ref I_ParsingStatus succedToExecute)
         {
 
-            string[] token = command.GetLine().Split(':');
+            string[] token = Split(command.GetLine(),":");
             RotationRequested rotation;
             bool found;
             GetRotationFromTokens(token, out found, out rotation);
@@ -50,6 +50,7 @@ namespace TextMacroIntent
             }
 
         }
+
 
         private void GetRotationFromTokens(string[] token, out bool found, out RotationRequested rotationResult)
         {
@@ -166,7 +167,7 @@ namespace TextMacroIntent
 
         public override I_InterpretorCompiledAction TryToGetCompiledAction(I_CommandLine command)
         {
-            string[] token = command.GetLine().Split(':');
+            string[] token =  Split(command.GetLine(), ":"); 
             RotationRequested rotation;
             bool found;
             GetRotationFromTokens(token, out found, out rotation);
@@ -176,15 +177,15 @@ namespace TextMacroIntent
             }
             return null;
         }
-
+       
 
         public void Push(RotationRequested m_rotation)
         {
             if (m_request != null && m_rotation != null)
                 m_request(m_rotation);
         }
-  
 
+      
 
         public class CompiledRotationRequest : I_InterpretorCompiledAction
         {
@@ -199,11 +200,11 @@ namespace TextMacroIntent
 
             public void Execute()
             {
-                I_ExecutionStatus s = null;
+                I_ParsingStatus s = null;
                 Execute(ref s);
             }
 
-            public void Execute(ref I_ExecutionStatus status)
+            public void Execute(ref I_ParsingStatus status)
             {
                 try
                 {

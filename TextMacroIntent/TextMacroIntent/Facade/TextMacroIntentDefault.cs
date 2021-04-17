@@ -2,27 +2,34 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using TextMacroIntent.Core;
+using TextMacroIntent;
 
 namespace TextMacroIntent
-{
-    public class TextMacroIntentDefault
+{           
+    ///BIG REMINDER FOR ME:
+             ///I AM CREATING A PARSER NOT A EXECUTOR
+             ///MEANING I CAN't WAIT THE PARSING EXECUTION BECAUSE
+             ///IT IS NOT REFLECTION THE TIME TO EXECUTE BUT TO PARSE
+             ///ALL THE RESPONABILITY OF TIME EXECUTING IS OUTSIDE THE PARSER AND SHOULD NOT BE DEAL BY THIS CLASSES.
+             ///
+    public class TextMacroIntentDefault : I_CommandLineAuctionToExecutor, I_CommandLineDirectExecutorWithReturn
     {
+
         I_CommandAuctionDistributor m_auctionHouse;
         I_CommandLineDirectExecutor m_directExecutor;
-        I_CommandLineWaiterExecutor m_waitingExecutor;
-
+        I_CommandLineDirectExecutorWithReturn m_directExecutorWithReturn;
         public TextMacroIntentDefault()
         {
             m_auctionHouse = new CommandAuctionDistributor();
             m_directExecutor = new CommandLineExecutorDefault(m_auctionHouse);
-            m_waitingExecutor = new CommandLineWaitingExecutorDefault(m_auctionHouse);
-            
+            m_directExecutorWithReturn  = new CommandLineExecutorDefault(m_auctionHouse);
+
+
+
         }
 
         public I_CommandAuctionDistributor GetAuction() { return m_auctionHouse; }
         public I_CommandLineDirectExecutor GetDirectExecutor() { return m_directExecutor; }
-        public I_CommandLineWaiterExecutor GetWaitingExecutor() { return m_waitingExecutor; }
 
 
         public void AddInterpreter(I_Interpreter rubix)
@@ -53,20 +60,97 @@ namespace TextMacroIntent
         }
 
 
+        public void Execute(string commandLine)
+        {
+            if(ThrowExceptionIfEmpty(m_directExecutor))
+            m_directExecutor.Execute(commandLine);
+        }
+
+        public void Execute(string[] commandLines)
+        {
+            if (ThrowExceptionIfEmpty(m_directExecutor))
+                m_directExecutor.Execute(commandLines);
+        }
+
+        public void Execute(I_CommandLine commandLine)
+        {
+            if (ThrowExceptionIfEmpty(m_directExecutor))
+                m_directExecutor.Execute(commandLine);
+        }
+
+        public void Execute(IEnumerable<I_CommandLine> commandLines)
+        {
+            if (ThrowExceptionIfEmpty(m_directExecutor))
+                m_directExecutor.Execute(commandLines);
+        }
+
+        public void Execute(I_CommandLineEnumList commandLines)
+        {
+            if (ThrowExceptionIfEmpty(m_directExecutor))
+                m_directExecutor.Execute(commandLines);
+        }
+
+        public bool SeekForFirstTaker(I_CommandLine command, out bool foundInterpreter, out I_Interpreter interpreter)
+        {
+            if (m_auctionHouse == null)
+            {
+                foundInterpreter = false;
+                 interpreter  = null; 
+                return false ;
+            }
+            return m_auctionHouse.SeekForFirstTaker(command, out foundInterpreter, out interpreter);
+        }
 
 
-        //public void TriggerRefreshThreads() {
+        private bool ThrowExceptionIfEmpty(I_CommandLineDirectExecutor directExecutor)
+        {
+            if (directExecutor == null)
+                throw new Exception("You forget to provide an executor");
+            return true;
+        }
+        private bool ThrowExceptionIfEmpty(I_CommandLineDirectExecutorWithReturn directExecutor)
+        {
+            if (directExecutor == null)
+                throw new Exception("You forget to provide an executor");
+            return true;
+        }
 
-        //    ThreadPool.QueueUserWorkItem(TimeSensitiveRefresh, (ushort)1);
-        //}
+        public void Execute(string commandLine, out I_ParsingStatus exeStatus)
+        {
+            if (ThrowExceptionIfEmpty(m_directExecutorWithReturn))
+                m_directExecutorWithReturn.Execute(commandLine,out exeStatus);
+            else exeStatus = failBecauseEmpty;
+        }
 
-        //private void TimeSensitiveRefresh(object timeToWaitObject)
-        //{
-        //    int timeToWait= (int) timeToWaitObject;
-        //    while (true) {
+        public void Execute(string[] commandLine, out I_ParsingStatus exeStatus)
+        {
+            if (ThrowExceptionIfEmpty(m_directExecutorWithReturn))
+                m_directExecutorWithReturn.Execute(commandLine, out exeStatus);
+            else exeStatus = failBecauseEmpty;
+        }
 
-        //        Thread.Sleep(timeToWait);
-        //    }
-        //}
+        public void Execute(I_CommandLine commandLine, out I_ParsingStatus exeStatus)
+        {
+            if (ThrowExceptionIfEmpty(m_directExecutorWithReturn))
+                m_directExecutorWithReturn.Execute(commandLine, out exeStatus);
+            else exeStatus = failBecauseEmpty;
+        }
+
+        public void Execute(IEnumerable<I_CommandLine> commandLines, out I_ParsingStatus exeStatus)
+        {
+            if (ThrowExceptionIfEmpty(m_directExecutorWithReturn))
+                m_directExecutorWithReturn.Execute(commandLines, out exeStatus);
+            else exeStatus = failBecauseEmpty;
+
+        }
+
+        public void Execute(I_CommandLineEnumList commandLines, out I_ParsingStatus exeStatus)
+        {
+            if (ThrowExceptionIfEmpty(m_directExecutorWithReturn))
+                m_directExecutorWithReturn.Execute(commandLines, out exeStatus);
+            else exeStatus = failBecauseEmpty;
+        }
+
+        private ParsingExecutionStatus failBecauseEmpty = new ParsingExecutionStatus("Failed to execute because of missing executor");
     }
 }

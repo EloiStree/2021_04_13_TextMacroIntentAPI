@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TextMacroIntent.Core.CommandLineType
+namespace TextMacroIntent
 {
 
     
@@ -24,11 +24,11 @@ namespace TextMacroIntent.Core.CommandLineType
 
         public void Execute()
         {
-            I_ExecutionStatus s = null;
+            I_ParsingStatus s = null;
             Execute(ref s);
         }
 
-        public void Execute(ref I_ExecutionStatus status)
+        public void Execute(ref I_ParsingStatus status)
         {
             if (m_compiledAction != null)
                 m_compiledAction.Execute(ref status);
@@ -45,7 +45,67 @@ namespace TextMacroIntent.Core.CommandLineType
         {
             return m_commandToExecute;
         }
+    }
 
-     
+    public class InterpretorEnumGroupCompiledAccess : I_InterpretorEnumCompiledAction
+    {
+        I_CommandLine[] m_commandsToExecute;
+        I_InterpretorCompiledAction[] m_commandsCompiledToExecute;
+        I_InterpretorCompiledAction m_compiledAction;
+
+       
+        public InterpretorEnumGroupCompiledAccess(I_Interpreter interpreter, params I_CommandLine[] commandsToExecute)
+        {
+            SetWith(interpreter, commandsToExecute);
+        }
+
+        private void SetWith(I_Interpreter interpreter, I_CommandLine[] commandsToExecute)
+        {
+            m_commandsToExecute = commandsToExecute;
+            m_commandsCompiledToExecute = new I_InterpretorCompiledAction[commandsToExecute.Length];
+            for (int i = 0; i < commandsToExecute.Length; i++)
+            {
+                m_compiledAction = interpreter.TryToGetCompiledAction(commandsToExecute[i]);
+            }
+        }
+
+        public void Execute()
+        {
+            I_ParsingStatus s = null;
+            for (int i = 0; i < m_commandsCompiledToExecute.Length; i++)
+            {
+                    m_commandsCompiledToExecute[i]. Execute(ref s);
+            }
+        }
+
+        public void Execute(ref I_ParsingStatus status)
+        {
+            if (status == null)
+                Execute();
+            I_ParsingStatus statusItem = new ParsingExecutionStatus();
+            for (int i = 0; i < m_commandsCompiledToExecute.Length; i++)
+            {
+                m_commandsCompiledToExecute[i].Execute(ref statusItem );
+                if (statusItem.HadError()) {
+                    status.SetAsFail("Execution of compiled command failed.\n" + statusItem.GetErrorInformation());
+                    return;
+                }
+            }
+
+            status.SetAsFinish(true);
+
+        }
+
+
+
+        public IEnumerable<I_CommandLine> GetLinkedCommandLines()
+        {
+            return m_commandsToExecute;
+        }
+
+        public IEnumerable<I_InterpretorCompiledAction> GetLinkedCompiledCommandLines()
+        {
+            return m_commandsCompiledToExecute;
+        }
     }
 }

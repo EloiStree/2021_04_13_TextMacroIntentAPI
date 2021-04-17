@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TextMacroIntent.Core.Time.LOOPER
+namespace TextMacroIntent
 {
     public class LoopCountCollection<T> where T : class
     {
